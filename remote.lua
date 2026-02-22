@@ -187,7 +187,7 @@ AddBtn.MouseButton1Click:Connect(addArg)
 local DelayBox = Instance.new("TextBox")
 DelayBox.Size = UDim2.new(1, -20, 0, 40)
 DelayBox.Position = UDim2.new(0, 10, 0, 40)
-DelayBox.Text = "0.1"
+DelayBox.Text = "0"
 DelayBox.PlaceholderText = "딜레이 (0 = 즉시)"
 DelayBox.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 DelayBox.Parent = ControlPanel
