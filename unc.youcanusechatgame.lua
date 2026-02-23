@@ -78,10 +78,10 @@ local function getKoreanTag(length)
 end
 
 -- [ 설정 영역 ]
-createLabel("메시지", UDim2.new(0, 10, 0, 15), MainFrame)
-local MsgInput = createInput("안녕하세요 테스트", UDim2.new(0, 10, 0, 35), MainFrame)
+createLabel("메시지 (\\n: 줄바꿈)", UDim2.new(0, 10, 0, 15), MainFrame)
+local MsgInput = createInput("안녕하세요\\n테스트", UDim2.new(0, 10, 0, 35), MainFrame)
 
-createLabel("대기 시간 (최소 0.1)", UDim2.new(0, 10, 0, 80), MainFrame)
+createLabel("대기 시간 (최소 0)", UDim2.new(0, 10, 0, 80), MainFrame)
 local WaitInput = createInput("0.5", UDim2.new(0, 10, 0, 100), MainFrame)
 
 -- [ 태그 버튼 ]
@@ -127,17 +127,25 @@ StartBtn.MouseButton1Click:Connect(function()
     _G.TestLoop = true
     
     task.spawn(function()
-        -- BridgeNet 브릿지 미리 로드 (성능 최적화)
-        local bridge = require(game:GetService("ReplicatedStorage").Replicated_ChatService.Events.BridgeNet).CreateBridge("ChatEvent")
-        
         while _G.TestLoop do
-            local waitTime = math.max(tonumber(WaitInput.Text) or 0.5, 0.1)
+            local waitTime = math.max(tonumber(WaitInput.Text) or 0.5, 0)
             local baseText = string.gsub(MsgInput.Text, "\\n", "\n")
-            local tagText = UseTag and (" [" .. getKoreanTag(2) .. "]") or ""
+            
+            local tagText = ""
+            if UseTag then
+                -- 한글 2글자 랜덤 태그
+                tagText = " [" .. getKoreanTag(2) .. "]"
+            end
+
             local finalMsg = baseText .. tagText
             
-            -- [ 적용된 한 줄 리모트 전송 ]
-            bridge:Fire(buffer.fromstring(finalMsg), nil, false)
+            -- 리모트 경로 설정
+            local remote = game:GetService("ReplicatedStorage"):FindFirstChild("SayMessageRequest") 
+            if remote then 
+                if remote and remote:IsA("RemoteEvent") then
+                    remote:FireServer(finalMsg)
+                end
+            end
             
             task.wait(waitTime)
         end
