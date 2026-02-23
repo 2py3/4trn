@@ -1,6 +1,6 @@
 -- 메인 설정 및 테이블 데이터
 local scriptData = {
-    {name = "Infinite Yield", url = "https://raw.githubusercontent.com/DarkNetworks/Infinite-Yield/main/latest.lua"},
+    {name = "Infinite Yield", url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
     {name = "높이 고정", url = "https://raw.githubusercontent.com/2py3/4trn/refs/heads/main/lock_yloc.lua"},
     {name = "플레이어 순간이동", url = "https://raw.githubusercontent.com/2py3/4trn/refs/heads/main/tptotarget.lua"},
     {name = "리모트 날리기", url = "https://raw.githubusercontent.com/2py3/4trn/refs/heads/main/remote.lua"},
