@@ -144,7 +144,7 @@ RunService.Heartbeat:Connect(function()
         elseif movingDown then 
             Root.CFrame *= CFrame.new(0, -liftSpeed, 0)
         end
-        Platform.CFrame = Root.CFrame * CFrame.new(0, -3.5, 0)
+        Platform.CFrame = Root.CFrame * CFrame.new(0, -3.50753, 0)
     end
 end)
 
