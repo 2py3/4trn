@@ -6,7 +6,6 @@ local CoreGui = game:GetService("CoreGui")
 local Player = Players.LocalPlayer
 
 -- [ 1. 중복 UI 제거 ]
--- CoreGui 내의 기존 UI를 찾아 삭제합니다.
 local existingUI = CoreGui:FindFirstChild("XenoFinalV17")
 if existingUI then
     existingUI:Destroy()
@@ -19,12 +18,11 @@ local currentOffset = 3.5
 local isCheatMoveActive = false
 local isHardLockActive = false
 
--- [ 2. UI 생성 - CoreGui 기준 ]
+-- [ 2. UI 생성 ]
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "XenoFinalV17"
-ScreenGui.Parent = CoreGui -- PlayerGui 대신 CoreGui 설정
+ScreenGui.Parent = CoreGui
 ScreenGui.ResetOnSpawn = false
--- 실행 권한 문제 방지를 위해 IgnoreGuiInset 설정
 ScreenGui.IgnoreGuiInset = true 
 
 local MainFrame = Instance.new("Frame", ScreenGui)
@@ -34,7 +32,6 @@ MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 
--- 상단 바 (드래그 영역)
 local TopBar = Instance.new("Frame", MainFrame)
 TopBar.Size = UDim2.new(1, 0, 0, 30)
 TopBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
@@ -50,7 +47,6 @@ Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- 닫기 버튼
 local CloseButton = Instance.new("TextButton", TopBar)
 CloseButton.Size = UDim2.new(0, 30, 1, 0)
 CloseButton.Position = UDim2.new(1, -30, 0, 0)
@@ -98,7 +94,7 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
--- [ 4. 메인 루프 (핵심 로직) ]
+-- [ 4. 메인 루프 (실시간 위치 제어 및 앵커링) ]
 RunService.Heartbeat:Connect(function()
     local Char = Player.Character
     local Root = Char and Char:FindFirstChild("HumanoidRootPart")
@@ -106,10 +102,11 @@ RunService.Heartbeat:Connect(function()
     local Cam = workspace.CurrentCamera
     if not Root or not Hum then return end
 
+    -- Cheat Move 또는 Hard Lock 중 하나라도 켜져 있으면 앵커 고정
     if isCheatMoveActive or isHardLockActive then
         Root.Anchored = true
-        Root.Velocity = Vector3.zero
-        Root.RotVelocity = Vector3.zero
+        Root.Velocity = Vector3.new(0,0,0)
+        Root.RotVelocity = Vector3.new(0,0,0)
         
         if isCheatMoveActive then
             local moveDir = Vector3.zero
@@ -129,7 +126,7 @@ RunService.Heartbeat:Connect(function()
             end
         end
     else
-        -- 기능을 껐을 때만 Anchor 해제 (단, 플랫폼 활성화 시 제외할 수도 있음)
+        -- 두 기능이 모두 꺼졌을 때만 앵커 해제 (플랫폼이 없을 때)
         if not isPlatformActive then
             Root.Anchored = false 
         end
@@ -186,10 +183,16 @@ end)
 
 MakeToggle("Hard Lock Pos", 80, function(state)
     isHardLockActive = state
+    -- 버튼을 눌렀을 때 캐릭터가 있다면 즉시 상태 반영
+    local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+    if root then root.Anchored = (isHardLockActive or isCheatMoveActive) end
 end)
 
 MakeToggle("Cheat Move (Fixed)", 120, function(state)
     isCheatMoveActive = state
+    -- 버튼을 눌렀을 때 캐릭터가 있다면 즉시 상태 반영
+    local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+    if root then root.Anchored = (isHardLockActive or isCheatMoveActive) end
 end)
 
 -- [ 6. 드래그 기능 구현 ]
